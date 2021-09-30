@@ -66,6 +66,23 @@ var createTaskEl = function(taskDataObj) {
   // add entire list item to list
   tasksToDoEl.appendChild(listItemEl);  
 
+  switch (taskDataObj.status) {
+    case "to do":
+      taskActionsEl.querySelector("select[name='status-change']").selectedIndex = 0;
+      tasksToDoEl.append(listItemEl);
+      break;
+    case "in progress":
+      taskActionsEl.querySelector("select[name='status-change']").selectedIndex = 1;
+      tasksInProgressEl.append(listItemEl);
+      break;
+    case "completed":
+      taskActionsEl.querySelector("select[name='status-change']").selectedIndex = 2;
+      tasksCompletedEl.append(listItemEl);
+      break;
+    default:
+      console.log("Something went wrong!");
+  }
+
   // save task as an object with name, type, status, and id properties then push it into tasks array
   taskDataObj.id = taskIdCounter;
 
@@ -176,11 +193,12 @@ var taskStatusChangeHandler = function(event) {
   // get the task item's id
   var taskId = event.target.getAttribute("data-task-id");
 
+  // find the parent task item element based on the id
+  var taskSelected = document.querySelector(
+    ".task-item[data-task-id='" + taskId + "']");
+
   // get the currently selected option's value and convert to lowercase
   var statusValue = event.target.value.toLowerCase();
-
-  // find the parent task item element based on the id
-  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
 
   // appends task to type selected
   if (statusValue === "to do") {
@@ -209,7 +227,8 @@ var editTask = function(taskId) {
   // console.log("editing task #" + taskId);
 
   // get task list item element
-  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+  var taskSelected = document.querySelector(
+    ".task-item[data-task-id='" + taskId + "']");
 
   // get content from task name and type
   var taskName = taskSelected.querySelector("h3.task-name").textContent;
@@ -222,16 +241,17 @@ var editTask = function(taskId) {
   document.querySelector("input[name='task-name']").value = taskName;
   document.querySelector("select[name='task-type']").value = taskType;
 
-  // change add task button to reflect save task, when editing
-  document.querySelector("#save-task").textContent = "Save Task";
-
   // add task id to form (not seen by user)
-  formEl.setAttribute("data-task-id", taskId);
+  formEl.setAttribute("data-task-id", taskId);  
+  
+  // change add task button to reflect save task, when editing
+  formEl.querySelector("#save-task").textContent = "Save Task";
 };
 
 // create delete task function
 var deleteTask = function(taskId) {
-  var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+  var taskSelected = document.querySelector(
+    ".task-item[data-task-id='" + taskId + "']");
   taskSelected.remove();
 
   // create new array to hold updated list of tasks
